@@ -3,6 +3,8 @@ import { useState } from 'react';
 
 export default function SignupScreen() {
     const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
   return (
     <View style={styles.container}>
 
@@ -11,12 +13,37 @@ export default function SignupScreen() {
         <TextInput
             style={styles.input}
             
-            placeholder="YourGamertag"
+            placeholder="Your Gamertag"
             placeholderTextColor="#ffffff"
             value={username}
             onChangeText={setUsername}
-            
         />
+        <Text style={styles.label}>Email</Text>  
+        <TextInput
+            style={styles.input}
+
+            placeholder="Email"
+            placeholderTextColor="#ffffff"
+            value={email}
+            onChangeText={setEmail}
+        />
+        <Text style={styles.label}>Password</Text>  
+        <TextInput
+            style={styles.input}
+
+            placeholder="Password"
+            placeholderTextColor="#ffffff"
+            value={password}
+            onChangeText={setPassword}
+        />
+        <TextInput 
+            style={styles.input}
+            placeholder="Confirm Password"
+            placeholderTextColor="#ffffff"
+            value={password}
+            onChangeText={setPassword}
+        />
+
     </View>
   );
 }
@@ -32,6 +59,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 28,
     fontWeight: 'bold',
+    marginBottom: 32,
   },
   label: {
     color: '#84929f',

@@ -10,7 +10,7 @@ export default function HomeScreen() {
         alignItems: "center",
       }}
     >
-      <Text>Hello, World</Text>
+      <Text>Hello, Welcome to WhatUpdate! Signup or Login!</Text>
       <Link href="/signup-screen">Go to Signup</Link>
       
     </View>
