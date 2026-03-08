@@ -1,12 +1,27 @@
-import { View, Text,TextInput, StyleSheet} from 'react-native';
+import { Text,TextInput, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
 import { useState } from 'react';
 
 export default function SignupScreen() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+
+    const handleSignup = () => {
+      if (password !== confirmPassword) {
+        alert("Passwords don't match!");
+        return;
+      }
+      if (password.length < 8) {
+        alert("Password must be at least 8 characters!");
+        return;
+      }
+      // TODO: call your backend here later
+      alert("Account created!");
+    };
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
 
         <Text style={styles.title}>Create Account</Text>
         <Text style={styles.label}>GAMERTAG</Text>        
@@ -29,6 +44,7 @@ export default function SignupScreen() {
         />
         <Text style={styles.label}>Password</Text>  
         <TextInput
+            secureTextEntry
             style={styles.input}
 
             placeholder="Password"
@@ -36,15 +52,20 @@ export default function SignupScreen() {
             value={password}
             onChangeText={setPassword}
         />
+        <Text style={styles.label}>Confirm Password</Text>
         <TextInput 
+            secureTextEntry
             style={styles.input}
+
             placeholder="Confirm Password"
             placeholderTextColor="#ffffff"
-            value={password}
-            onChangeText={setPassword}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
         />
-
-    </View>
+        <TouchableOpacity style={styles.button} onPress={handleSignup}>
+          <Text style={styles.buttonText}>SIGN UP</Text>
+        </TouchableOpacity>
+    </ScrollView>
   );
 }
 
@@ -52,8 +73,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#2b5a54',
+  },
+  content: {
     paddingHorizontal: 28,
-    justifyContent: 'center',
+    paddingTop: 80,
+    paddingBottom: 40,
   },
   title: {
     color: '#FFFFFF',
@@ -62,8 +86,8 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   label: {
-    color: '#84929f',
-    fontSize: 11,
+    color: '#c0d5e9',
+    fontSize: 14,
     letterSpacing: 3,
     marginBottom: 8,
   },
@@ -74,8 +98,21 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    color: '#ffffff',      // ← this controls what you type
+    color: '#ffffff',
     fontSize: 15,
     marginBottom: 18,
+  },
+  button: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  buttonText: {
+    color: '#2b5a54',
+    fontSize: 15,
+    fontWeight: 'bold',
+    letterSpacing: 3,
   },
 });
