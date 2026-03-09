@@ -3,11 +3,11 @@ import { useState } from 'react';
 
 export default function LoginScreen() {
     const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const handleLogin = () =>{
-      //Add backend to valdiate if the username, matches with the email, then if both of those match with the password in the database
-    }
+      // TODO: call backend — POST /api/auth/login
+      // Send username + password, receive JWT token back    
+}
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Login</Text>
@@ -19,17 +19,10 @@ export default function LoginScreen() {
           value={username}
           onChangeText={setUsername}
     />
-    <Text style={styles.label}>Email</Text> 
-    <TextInput
-          style={styles.input}
-          placeholder="Your email"
-          placeholderTextColor="#ffffff"
-          value={email}
-          onChangeText={setEmail}
-    />
     <Text style={styles.label}>Password</Text> 
     <TextInput
           style={styles.input}
+          secureTextEntry
           placeholder="Your Password"
           placeholderTextColor="#ffffff"
           value={password}
