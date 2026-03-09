@@ -1,4 +1,4 @@
-import { Text, ScrollView, TouchableOpacity,StyleSheet } from "react-native";
+import { Text, ScrollView, TouchableOpacity,StyleSheet} from "react-native";
 import { Link } from 'expo-router';
 
 export default function HomeScreen() {
@@ -10,12 +10,17 @@ export default function HomeScreen() {
       alignItems: "center",
       paddingTop: 80,
   }}>
-    
       <Text style={styles.title}>Hello, Welcome to WhatUpdate! Signup or Login!</Text>
       <Link href="/signup-screen" asChild>
-        <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Go to Signup</Text>
+        <TouchableOpacity style={styles.signUpButton}>
+            <Text style={styles.buttonText}>Sign up</Text>
         </TouchableOpacity>
+       </Link>
+
+       <Link href="/login" asChild>
+       <TouchableOpacity style={styles.loginButton}>
+        <Text style={styles.buttonText}>Login</Text>
+       </TouchableOpacity>
        </Link>
     </ScrollView>
   );
@@ -38,19 +43,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 32,
   },
-  button: {
+  signUpButton: {
     backgroundColor: '#ffffff',
     borderRadius: 8,
     borderWidth: 2,
-    paddingVertical: 16,
-    paddingHorizontal: 40,
+    width: 250,
+    height: 80,
+    justifyContent: 'center',  // ← centers text vertically
     alignItems: 'center',
     marginTop: 8,
   },
+  loginButton: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    borderWidth: 2,
+    width: 250,
+    height: 80,
+    justifyContent: 'center',  // ← centers text vertically
+    alignItems: 'center',
+    marginTop: 16,
+  },
   buttonText: {
     color: '#223533',
-    fontSize: 15,
+    fontSize: 30,
     fontWeight: 'bold',
-    letterSpacing: 3,
-  }
+    letterSpacing: 2,
+  },
 });
