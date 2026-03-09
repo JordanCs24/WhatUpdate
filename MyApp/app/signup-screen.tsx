@@ -8,16 +8,24 @@ export default function SignupScreen() {
     const [confirmPassword, setConfirmPassword] = useState("");
 
     const handleSignup = () => {
-      if (password !== confirmPassword) {
-        alert("Passwords don't match!");
-        return;
-      }
-      if (password.length < 8) {
-        alert("Password must be at least 8 characters!");
-        return;
-      }
-      // TODO: call your backend here later
-      alert("Account created!");
+        if (username === ""){
+            alert("Username needed!");
+            return;
+        }
+        if (!email.includes("@")){
+            alert("Invalid email address!");
+            return;
+        }
+        if (password !== confirmPassword) {
+            alert("Passwords don't match!");
+            return;
+        }
+        if (password.length < 8) {
+            alert("Password must be at least 8 characters!");
+            return;
+        }
+        // TODO: call backend here later
+        alert("Account created!");
     };
 
   return (
@@ -27,7 +35,6 @@ export default function SignupScreen() {
         <Text style={styles.label}>GAMERTAG</Text>        
         <TextInput
             style={styles.input}
-            
             placeholder="Your Gamertag"
             placeholderTextColor="#ffffff"
             value={username}
@@ -36,7 +43,6 @@ export default function SignupScreen() {
         <Text style={styles.label}>Email</Text>  
         <TextInput
             style={styles.input}
-
             placeholder="Email"
             placeholderTextColor="#ffffff"
             value={email}
@@ -54,7 +60,7 @@ export default function SignupScreen() {
         />
         <Text style={styles.label}>Confirm Password</Text>
         <TextInput 
-            secureTextEntry
+            secureTextEntry 
             style={styles.input}
 
             placeholder="Confirm Password"
