@@ -5,21 +5,39 @@ export default function LoginScreen() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
     const handleLogin = () =>{
-
+      //Add backend to valdiate if the username, matches with the email, then if both of those match with the password in the database
     }
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Login</Text>
-    <Text style={styles.label}>GAMERTAG</Text>   
-      <TextInput 
-            style={styles.input}
-            placeholder="Your Gamertag"
-            placeholderTextColor="#ffffff"
-            value={username}
-            onChangeText={setUsername}
+    <Text style={styles.label}>GAMERTAG</Text> 
+    <TextInput 
+          style={styles.input}
+          placeholder="Your Gamertag"
+          placeholderTextColor="#ffffff"
+          value={username}
+          onChangeText={setUsername}
     />
+    <Text style={styles.label}>Email</Text> 
+    <TextInput
+          style={styles.input}
+          placeholder="Your email"
+          placeholderTextColor="#ffffff"
+          value={email}
+          onChangeText={setEmail}
+    />
+    <Text style={styles.label}>Password</Text> 
+    <TextInput
+          style={styles.input}
+          placeholder="Your Password"
+          placeholderTextColor="#ffffff"
+          value={password}
+          onChangeText={setPassword}
+    />
+    <TouchableOpacity style={styles.button} onPress={handleLogin}>
+      <Text style={styles.buttonText}>Login</Text>
+    </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -39,7 +57,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 32,
-    justifyContent: 'center'
   },
   label: {
     color: '#c0d5e9',

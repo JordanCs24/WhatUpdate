@@ -68,7 +68,7 @@ export default function SignupScreen() {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
         />
-        <TouchableOpacity style={styles.button} onPress={handleSignup}>
+        <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>SIGN UP</Text>
         </TouchableOpacity>
     </ScrollView>
