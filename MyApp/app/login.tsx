@@ -5,6 +5,8 @@ export default function LoginScreen() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const handleLogin = () =>{
+      alert("No account found!");
+      return;
       // TODO: call backend — POST /api/auth/login
       // Send username + password, receive JWT token back    
 }

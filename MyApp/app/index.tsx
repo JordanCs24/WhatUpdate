@@ -22,6 +22,12 @@ export default function HomeScreen() {
         <Text style={styles.buttonText}>Login</Text>
        </TouchableOpacity>
        </Link>
+
+       <Link href="/gameselect" asChild>
+       <TouchableOpacity style={styles.loginButton}>
+        <Text style={styles.buttonText}>GameSelect</Text>
+       </TouchableOpacity>
+       </Link>
     </ScrollView>
   );
 }
