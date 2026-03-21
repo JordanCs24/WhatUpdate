@@ -1,4 +1,5 @@
-import { Text, StyleSheet, ScrollView } from 'react-native';
+import { Text, StyleSheet, ScrollView, View, TouchableOpacity, } from 'react-native';
+import { useState } from 'react';
 
 const UPDATES = [
   {
@@ -34,9 +35,48 @@ const UPDATES = [
 ];
 
 export default function FeedScreen() {
+    const [expandedId, setExpandedId] = useState<string | null>(null);
+
+    const toggleCard = (id: string) => {
+    setExpandedId(expandedId === id ? null : id);
+    };
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Your Updates</Text>
+
+      {UPDATES.map(item => (
+        <View key={item.id} style={styles.card}>
+          
+          {/* Game banner */}
+          <TouchableOpacity onPress={() => toggleCard(item.id)}>
+            <View style={[styles.banner, { backgroundColor: item.image }]}>
+              <Text style={styles.gameName}>{item.game}</Text>
+              <Text style={styles.arrow}>{expandedId === item.id ? '▲' : '▼'}</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Collapsible updates */}
+          {expandedId === item.id && (
+            <View style={styles.updates}>
+              <Text style={styles.categoryTitle}>🆕 New Content</Text>
+              {item.updates.newContent.map((update, index) => (
+                <Text key={index} style={styles.updateItem}>• {update}</Text>
+              ))}
+
+              <Text style={styles.categoryTitle}>🐛 Bug Fixes</Text>
+              {item.updates.bugFixes.map((update, index) => (
+                <Text key={index} style={styles.updateItem}>• {update}</Text>
+              ))}
+
+              <Text style={styles.categoryTitle}>⚖️ Balance Changes</Text>
+              {item.updates.balanceChanges.map((update, index) => (
+                <Text key={index} style={styles.updateItem}>• {update}</Text>
+              ))}
+            </View>
+          )}
+
+        </View>
+      ))}
     </ScrollView>
   );
 }
@@ -56,5 +96,43 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 32,
+  },
+  card: {
+    backgroundColor: '#0D1117',
+    borderRadius: 12,
+    marginBottom: 16,
+    overflow: 'hidden',
+  },
+  banner: {
+    padding: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  gameName: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  arrow: {
+    color: '#ffffff',
+    fontSize: 16,
+  },
+  updates: {
+    padding: 16,
+  },
+  categoryTitle: {
+    color: '#00C878',
+    fontSize: 13,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    marginTop: 12,
+    marginBottom: 6,
+  },
+  updateItem: {
+    color: '#c0d5e9',
+    fontSize: 13,
+    marginBottom: 4,
+    lineHeight: 20,
   },
 });
