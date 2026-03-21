@@ -28,6 +28,13 @@ export default function HomeScreen() {
         <Text style={styles.buttonText}>GameSelect</Text>
        </TouchableOpacity>
        </Link>
+
+       <Link href="/feed" asChild>
+       <TouchableOpacity style={styles.feedButton}>
+        <Text style={styles.buttonText}>Feed</Text>
+       </TouchableOpacity>
+       </Link>
+
     </ScrollView>
   );
 }
@@ -60,6 +67,16 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   loginButton: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    borderWidth: 2,
+    width: 250,
+    height: 80,
+    justifyContent: 'center',  // ← centers text vertically
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  feedButton: {
     backgroundColor: '#ffffff',
     borderRadius: 8,
     borderWidth: 2,
