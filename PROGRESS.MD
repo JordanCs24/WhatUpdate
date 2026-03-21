@@ -22,3 +22,15 @@ WhatUpdate/
       signup-screen.tsx
       login.tsx  ← currently building
 To run the app: cd WhatUpdate/MyApp then npx expo start  
+
+app/game-select.tsx — Game Selection screen completed
+
+Hardcoded GAMES array with 8 games outside the component
+selectedGames state is a string[] array to hold multiple selections
+toggleGame(id) function adds/removes games using spread operator and filter
+handleContinue validates at least one game is selected
+Grid layout using flexDirection: 'row' and flexWrap: 'wrap'
+Cards highlight green when selected using conditional styling
+Will be replaced with backend fetch call later
+
+New concepts learned: arrays in state, .map() to render lists, .filter() and spread operator ... for array updates, key prop on mapped elements, conditional styling with arrays

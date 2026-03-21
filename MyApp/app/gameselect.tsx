@@ -10,23 +10,39 @@ const GAMES = [
   { id: '6', name: 'Rocket League' },
   {id: '7', name: 'HellDivers'},
   {id: '8', name: 'Grounded'},
-
+  //We'll add some of the backend later
 ];
 
-export default function GameSelectScreen() {
-  const [selectedGames, setSelectedGames] = useState([]);
 
+export default function GameSelectScreen() {
+  const [selectedGames, setSelectedGames] = useState<string[]>([]);
+
+
+/*
+  toggleGame is using the string paramater to find the 
+  games based on id then it checks the selectedGames if they actually exist
+*/
   const toggleGame = (id: string) => {
     if (selectedGames.includes(id)) {
       setSelectedGames(selectedGames.filter(game => game !== id));
     } else {
-      setSelectedGames([selectedGames, id]);
+      setSelectedGames([...selectedGames, id]);
     }
+  };
+  const handleContinue = () => {
+  if (selectedGames.length === 0) {
+    alert("Please select at least one game!");
+    return;
+  }
+  // TODO: save selections and navigate to next screen
+  alert(`You selected ${selectedGames.length} games!`);
   };
   
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Pick Your Games</Text>
+      <Text style={styles.subtitle}>Select the games you want updates for</Text>
+      
         <View style={styles.grid}>
       {GAMES.map(game => (
           <TouchableOpacity
@@ -38,8 +54,9 @@ export default function GameSelectScreen() {
           </TouchableOpacity>
       ))}
   </View>
-      <Text style={styles.subtitle}>Select the games you want updates for</Text>
-      
+      <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+        <Text style={styles.buttonText}>Continue</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -86,5 +103,21 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  continueButton: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    borderWidth: 2,
+    width: 250,
+    height: 80,
+    justifyContent: 'center',  // ← centers text vertically
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  buttonText: {
+    color: '#2b5a54',
+    fontSize: 15,
+    fontWeight: 'bold',
+    letterSpacing: 3,
   },
 });
