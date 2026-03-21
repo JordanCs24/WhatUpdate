@@ -1,6 +1,7 @@
 import { Text, ScrollView, TouchableOpacity,StyleSheet} from "react-native";
 import { Link } from 'expo-router';
 
+
 export default function HomeScreen() {
   return (
     <ScrollView
@@ -20,18 +21,6 @@ export default function HomeScreen() {
        <Link href="/login" asChild>
        <TouchableOpacity style={styles.loginButton}>
         <Text style={styles.buttonText}>Login</Text>
-       </TouchableOpacity>
-       </Link>
-
-       <Link href="/gameselect" asChild>
-       <TouchableOpacity style={styles.loginButton}>
-        <Text style={styles.buttonText}>GameSelect</Text>
-       </TouchableOpacity>
-       </Link>
-
-       <Link href="/feed" asChild>
-       <TouchableOpacity style={styles.feedButton}>
-        <Text style={styles.buttonText}>Feed</Text>
        </TouchableOpacity>
        </Link>
 
@@ -67,16 +56,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   loginButton: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    borderWidth: 2,
-    width: 250,
-    height: 80,
-    justifyContent: 'center',  // ← centers text vertically
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  feedButton: {
     backgroundColor: '#ffffff',
     borderRadius: 8,
     borderWidth: 2,

@@ -1,11 +1,13 @@
 import { Text,TextInput, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
 import { useState } from 'react';
+import { useRouter } from 'expo-router';
 
 export default function SignupScreen() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const router = useRouter();
 
     const handleSignup = () => {
         if (username === ""){
@@ -25,7 +27,8 @@ export default function SignupScreen() {
             return;
         }
         // TODO: call backend here later
-        alert("Account created!");
+        alert("Account Created!");
+        router.push('/gameselect');
     };
 
   return (
@@ -68,7 +71,7 @@ export default function SignupScreen() {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
         />
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleSignup}>
           <Text style={styles.buttonText}>SIGN UP</Text>
         </TouchableOpacity>
     </ScrollView>

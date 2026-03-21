@@ -1,5 +1,6 @@
 import { Text, StyleSheet, ScrollView, TouchableOpacity, View } from 'react-native';
 import { useState } from 'react';
+import { useRouter } from 'expo-router';
 
 const GAMES = [
   { id: '1', name: 'Fortnite' },
@@ -16,7 +17,7 @@ const GAMES = [
 
 export default function GameSelectScreen() {
   const [selectedGames, setSelectedGames] = useState<string[]>([]);
-
+  const router = useRouter();
 
 /*
   toggleGame is using the string paramater to find the 
@@ -35,7 +36,7 @@ export default function GameSelectScreen() {
     return;
   }
   // TODO: save selections and navigate to next screen
-  alert(`You selected ${selectedGames.length} games!`);
+  router.push('/feed');
   };
   
   return (
