@@ -1,14 +1,19 @@
 import {Text, StyleSheet, TextInput, TouchableOpacity, ScrollView} from 'react-native';
 import { useState } from 'react';
+import { useRouter } from 'expo-router';
 
 export default function LoginScreen() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const router = useRouter();
+
     const handleLogin = () =>{
       alert("No account found!");
       return;
       // TODO: call backend — POST /api/auth/login
-      // Send username + password, receive JWT token back    
+      // Send username + password, receive JWT token back 
+      router.push('/gameselect');  
+
 }
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
