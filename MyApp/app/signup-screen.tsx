@@ -29,7 +29,7 @@ export default function SignupScreen() {
         
         
         // Backend call here 
-        const API_URL = ('10.2.38.193');
+        const API_URL = 'http://10.2.38.193:3000';
         
         try {
         const response = await fetch(`${API_URL}/api/auth/register`, {
@@ -41,7 +41,7 @@ export default function SignupScreen() {
         const data = await response.json();
 
         if (response.ok) {
-            alert(`Welcome ${data.username}!`);
+            alert(`Welcome ${data.username}!, Now let's get your favorite games updates`);
             router.push('/gameselect');
         } else {
             alert(data.message);
