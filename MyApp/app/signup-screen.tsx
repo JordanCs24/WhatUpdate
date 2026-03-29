@@ -9,7 +9,7 @@ export default function SignupScreen() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const router = useRouter();
 
-    const handleSignup = () => {
+    const handleSignup = async () => {
         if (username === ""){
             alert("Username needed!");
             return;
@@ -26,9 +26,29 @@ export default function SignupScreen() {
             alert("Password must be at least 8 characters!");
             return;
         }
-        // TODO: call backend here later
-        alert("Account Created!");
-        router.push('/gameselect');
+        
+        
+        // Backend call here 
+        const API_URL = ('10.2.38.193');
+        
+        try {
+        const response = await fetch(`${API_URL}/api/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert(`Welcome ${data.username}!`);
+            router.push('/gameselect');
+        } else {
+            alert(data.message);
+        }
+    } catch (err) {
+        alert('Could not connect to server!');
+    }
     };
 
   return (
