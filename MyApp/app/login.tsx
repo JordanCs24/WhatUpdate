@@ -1,6 +1,8 @@
 import {Text, StyleSheet, TextInput, TouchableOpacity, ScrollView} from 'react-native';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function LoginScreen() {
     const [username, setUsername] = useState("");
@@ -8,8 +10,6 @@ export default function LoginScreen() {
     const router = useRouter();
 
     const handleLogin = async () =>{
-      alert("No account found!");
-      // TODO: call backend — POST /api/auth/login
       // Send username + password, receive JWT token back 
       const API_URL = 'http://10.2.38.193:3000';
         
@@ -23,7 +23,9 @@ export default function LoginScreen() {
         const data = await response.json();
 
         if (response.ok) {
-            alert(`Welcome ${data.username}!, Now let's get your favorite games updates`);
+            await AsyncStorage.setItem('token', data.token);
+            await AsyncStorage.setItem('username', data.username);
+            alert(`Welcome ${data.username}! Now let's get your favorite games updates`);
             router.push('/gameselect');
         } else {
             alert(data.message);

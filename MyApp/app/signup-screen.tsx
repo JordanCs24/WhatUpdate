@@ -1,6 +1,7 @@
 import { Text,TextInput, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignupScreen() {
     const [username, setUsername] = useState("");
@@ -41,7 +42,9 @@ export default function SignupScreen() {
         const data = await response.json();
 
         if (response.ok) {
-            alert(`Welcome back ${data.username}!`);
+            await AsyncStorage.setItem('token', data.token);
+            await AsyncStorage.setItem('username', data.username);
+            alert(`Welcome ${data.username}! Now let's get your favorite games updates`);
             router.push('/gameselect');
         } else {
             alert(data.message);

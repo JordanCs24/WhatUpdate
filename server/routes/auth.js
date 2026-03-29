@@ -20,6 +20,7 @@ const User = require('../models/User'); // User model
  */
 
 router.post('/register', async (req, res) => {
+  console.log('Register hit!', req.body);
   try {
     const { username, email, password } = req.body;
 
@@ -30,19 +31,26 @@ router.post('/register', async (req, res) => {
     }
 
     // Encrypt the password
+    console.log('Encrypting password...');
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create the user
+    console.log('Creating user...');
     const user = new User({ username, email, password: hashedPassword });
     await user.save();
 
     // Create JWT token
+    console.log('Creating token...');
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
     res.status(201).json({ token, username: user.username });
 
   } catch (err) {
+    console.log('ERROR:', err.message);
+    if (err.code === 11000) {
+      return res.status(400).json({ message: 'Email or username already exists!' });
+    }
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
