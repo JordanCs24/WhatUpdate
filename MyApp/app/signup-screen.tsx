@@ -35,13 +35,13 @@ export default function SignupScreen() {
         const response = await fetch(`${API_URL}/api/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, email, password }),
+            body: JSON.stringify({ username, email,password }),
         });
 
         const data = await response.json();
 
         if (response.ok) {
-            alert(`Welcome ${data.username}!, Now let's get your favorite games updates`);
+            alert(`Welcome back ${data.username}!`);
             router.push('/gameselect');
         } else {
             alert(data.message);

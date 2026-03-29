@@ -7,12 +7,30 @@ export default function LoginScreen() {
     const [password, setPassword] = useState("");
     const router = useRouter();
 
-    const handleLogin = () =>{
+    const handleLogin = async () =>{
       alert("No account found!");
-      return;
       // TODO: call backend — POST /api/auth/login
       // Send username + password, receive JWT token back 
-      router.push('/gameselect');  
+      const API_URL = 'http://10.2.38.193:3000';
+        
+        try {
+        const response = await fetch(`${API_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert(`Welcome ${data.username}!, Now let's get your favorite games updates`);
+            router.push('/gameselect');
+        } else {
+            alert(data.message);
+        }
+    } catch (err) {
+        alert('Could not connect to server!');
+    }  
 
 }
   return (
