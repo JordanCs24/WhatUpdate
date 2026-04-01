@@ -34,3 +34,8 @@ Cards highlight green when selected using conditional styling
 Will be replaced with backend fetch call later
 
 New concepts learned: arrays in state, .map() to render lists, .filter() and spread operator ... for array updates, key prop on mapped elements, conditional styling with arrays
+
+TODO: Write full documentation for all files
+- JSDoc comments on all functions
+- README.md for both MyApp and server folders
+- API endpoint documentation

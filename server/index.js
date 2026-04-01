@@ -28,3 +28,4 @@ mongoose.connect(process.env.MONGO_URI)
   
 // Routes
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/games', require('./routes/games'));

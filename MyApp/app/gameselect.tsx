@@ -1,6 +1,7 @@
 import { Text, StyleSheet, ScrollView, TouchableOpacity, View } from 'react-native';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const GAMES = [
   { id: '1', name: 'Fortnite' },
@@ -33,8 +34,17 @@ export default function GameSelectScreen() {
   const handleContinue = () => {
   if (selectedGames.length === 0) {
     alert("Please select at least one game!");
-    return;
   }
+  const API_URL = 'http://10.2.38.193:3000';
+
+  try{
+    const token = await AsyncStorage.getItem('token');
+    const respone = await fetch(`${API_URL}/api/games`,{
+      
+    });
+
+    
+  } catch (err){}
   // TODO: save selections and navigate to next screen
   router.push('/feed');
   };
