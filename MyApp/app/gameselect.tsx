@@ -31,22 +31,37 @@ export default function GameSelectScreen() {
       setSelectedGames([...selectedGames, id]);
     }
   };
-  const handleContinue = () => {
+  const handleContinue = async () => {
   if (selectedGames.length === 0) {
     alert("Please select at least one game!");
+    return;
   }
   const API_URL = 'http://10.2.38.193:3000';
 
+  // Send selected games to the backend
+  // Token is included in the header to verify the user's identity
   try{
     const token = await AsyncStorage.getItem('token');
-    const respone = await fetch(`${API_URL}/api/games`,{
-      
-    });
+    const response = await fetch(`${API_URL}/api/games/save`,{
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ games: selectedGames }),
 
+    });
+    const data = await response.json();
+    if (response.ok) {
+        router.push('/feed');
+    } else {
+        alert(data.message);
+    }
     
-  } catch (err){}
-  // TODO: save selections and navigate to next screen
-  router.push('/feed');
+  }
+   catch (err){ 
+    alert('Could not connect to server!');
+    }
   };
   
   return (
