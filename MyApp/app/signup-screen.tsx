@@ -2,6 +2,7 @@ import { Text,TextInput, StyleSheet, TouchableOpacity, ScrollView} from 'react-n
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import API_URL from './config';
 
 export default function SignupScreen() {
     const [username, setUsername] = useState("");
@@ -30,8 +31,6 @@ export default function SignupScreen() {
         
         
         // Backend call here 
-        const API_URL = 'http://10.2.38.193:3000';
-        
         try {
         const response = await fetch(`${API_URL}/api/auth/register`, {
             method: 'POST',

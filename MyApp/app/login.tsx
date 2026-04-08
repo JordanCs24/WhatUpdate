@@ -2,6 +2,7 @@ import {Text, StyleSheet, TextInput, TouchableOpacity, ScrollView} from 'react-n
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import API_URL from './config';
 
 
 export default function LoginScreen() {
@@ -11,7 +12,7 @@ export default function LoginScreen() {
 
     const handleLogin = async () =>{
       // Send username + password, receive JWT token back 
-      const API_URL = 'http://10.2.38.193:3000';
+      //const API_URL = 'http://172.27.63.102:3000';
         
         try {
         const response = await fetch(`${API_URL}/api/auth/login`, {

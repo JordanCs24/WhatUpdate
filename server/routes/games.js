@@ -19,9 +19,9 @@ router.post('/save', async (req, res) => {
     const { userId, games } = req.body;
 
     const user = await User.findByIdAndUpdate(
-      userId,
-      { games },
-      { new: true }
+        userId,
+        { games },
+        { returnDocument: 'after' }  // replace { new: true } with this
     );
 
     if (!user) {
