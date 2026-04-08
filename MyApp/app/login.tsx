@@ -2,7 +2,7 @@ import {Text, StyleSheet, TextInput, TouchableOpacity, ScrollView} from 'react-n
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import API_URL from './config';
+import API_URL from '../api_url';
 
 
 export default function LoginScreen() {
