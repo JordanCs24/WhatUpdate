@@ -36,4 +36,34 @@ router.post('/save', async (req, res) => {
   }
 });
 
+/**
+ * @route   GET /api/games
+ * @desc    Get the games a user has saved
+ *          1. verifyToken middleware extracts user ID from JWT token
+ *          2. Find the user by their ID and return their games array
+ * @access  Private (token required)
+ * 
+ * @returns { games }
+ * @errors  404 - User not found
+ *          500 - Server error
+ */
+router.get('/', verifyToken, async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found!' });
+    }
+
+    res.status(200).json({ games: user.games });
+
+  } catch (err) {
+    console.log('ERROR:', err.message);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+
 module.exports = router;

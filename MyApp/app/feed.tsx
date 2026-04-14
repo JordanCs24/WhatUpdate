@@ -1,5 +1,8 @@
 import { Text, StyleSheet, ScrollView, View, TouchableOpacity, } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import API_URL from '../api_url';
+
 
 const UPDATES = [
   {
@@ -32,10 +35,41 @@ const UPDATES = [
       balanceChanges: ['Caustic gas damage increased', 'Wingman headshot multiplier reduced'],
     }
   },
-];
+];  
 
 export default function FeedScreen() {
     const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [userGames, setUserGames] = useState<string[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchGames = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/games`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUserGames(data.games);
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert('Could not connect to server!');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchGames();
+  }, []);
+
 
     const toggleCard = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
