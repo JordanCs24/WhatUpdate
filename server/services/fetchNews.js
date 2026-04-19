@@ -1,43 +1,102 @@
+const axios = require('axios');
+const cheerio = require('cheerio');
+const { getJson } = require('serpapi');
 const { summarizeUpdate } = require('./gemini');
 
 /**
- * @desc    Fetches gaming news for a specific game and summarizes it
- *          using Gemini AI into structured update categories
- * @param   {string} gameId - the game's ID from our GAMES list
+ * @desc    Uses SerpAPI to find the latest news URLs for a game
+ * @param   {string} gameName - the name of the game
+ * @returns {string[]} list of URLs to scrape
+ */
+const findNewsUrls = async (gameName) => {
+  try {
+    const results = await getJson({
+      engine: 'google',
+      q: `${gameName} game patch notes latest update 2026`,
+      api_key: process.env.SERPAPI_KEY,
+      num: 3,
+    });
+
+    const urls = results.organic_results
+      ?.slice(0, 3)
+      .map(result => result.link)
+      .filter(Boolean);
+
+    console.log(`Found URLs for ${gameName}:`, urls);
+    return urls || [];
+  } catch (err) {
+    console.log(`Error finding URLs for ${gameName}:`, err.message);
+    return [];
+  }
+};
+
+/**
+ * @desc    Scrapes text content from a URL
+ * @param   {string} url - the URL to scrape
+ * @returns {string} extracted text content
+ */
+const scrapeUrl = async (url) => {
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+      },
+      timeout: 10000,
+    });
+
+    const $ = cheerio.load(response.data);
+    $('script, style, nav, footer, header').remove();
+
+    const text = $('body').text()
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 3000);
+
+    return text;
+  } catch (err) {
+    console.log(`Failed to scrape ${url}:`, err.message);
+    return null;
+  }
+};
+
+/**
+ * @desc    Fetches and summarizes real gaming news for a specific game
+ *          1. Uses SerpAPI to find relevant news URLs
+ *          2. Scrapes content from those URLs
+ *          3. Sends content to Gemini for summarization
+ * @param   {string} gameId - the game's ID
  * @param   {string} gameName - the name of the game
  * @returns {object} { gameId, gameName, summary, fetchedAt }
  */
 const fetchGameUpdate = async (gameId, gameName) => {
-  // TODO: Replace with real news scraping later
-  // For now we use hardcoded sample news to test the AI summarization
-  const sampleNews = {
-    'Fortnite': `Fortnite Chapter 5 Season 2 brings a brand new map with ancient Greek themes. 
-    New weapon: Thunderbolt of Zeus added to loot pool. 
-    The Mythic Medallion system has been reworked. 
-    Bug fix: Players no longer fall through the map near Lavish Lair. 
-    Bug fix: Shotgun spread issue has been resolved. 
-    Balance change: SMG damage reduced from 18 to 16. 
-    Balance change: Shield potion now takes 3 seconds to use instead of 2.`,
+  console.log(`Fetching updates for ${gameName}...`);
 
-    'Warzone': `Warzone Season 3 introduces new operator skins and a limited time mode. 
-    New content: Resurgence Trios mode added for limited time. 
-    New weapon: Kar98k returns to ground loot. 
-    Bug fix: Fixed parachute clipping through terrain. 
-    Balance change: Sniper bullet velocity increased by 15%.`,
+  // Step 1: Find news URLs for this game
+  const urls = await findNewsUrls(gameName);
 
-    'Apex Legends': `Apex Legends Season 21 introduces a new legend named Alter. 
-    New content: Alter can create void portals for repositioning. 
-    New care package weapon: G7 Scout added. 
-    Bug fix: Fixed Wraith hitbox being larger than intended. 
-    Bug fix: Kings Canyon audio crackling issue fixed. 
-    Balance change: Caustic gas now deals 6 damage per tick up from 5. 
-    Balance change: Wingman headshot multiplier reduced to 1.5x.`,
-  };
+  if (urls.length === 0) {
+    console.log(`No URLs found for ${gameName}`);
+    return null;
+  }
 
-  const rawContent = sampleNews[gameName] || `Latest updates for ${gameName}`;
+  // Step 2: Scrape each URL
+  let combinedContent = '';
+  for (const url of urls) {
+    console.log(`Scraping ${url}...`);
+    const content = await scrapeUrl(url);
+    if (content) {
+      combinedContent += content + '\n\n';
+    }
+  }
 
+  if (!combinedContent) {
+    console.log(`No content scraped for ${gameName}`);
+    return null;
+  }
+
+  // Step 3: Send to Gemini for summarization
   try {
-    const summary = await summarizeUpdate(gameName, rawContent);
+    const summary = await summarizeUpdate(gameName, combinedContent);
     return {
       gameId,
       gameName,
@@ -45,7 +104,7 @@ const fetchGameUpdate = async (gameId, gameName) => {
       fetchedAt: new Date(),
     };
   } catch (err) {
-    console.log(`Error fetching update for ${gameName}:`, err.message);
+    console.log(`Error summarizing update for ${gameName}:`, err.message);
     return null;
   }
 };

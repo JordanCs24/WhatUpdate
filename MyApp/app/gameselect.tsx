@@ -3,18 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API_URL from '../api_url';
-
-const GAMES = [
-  { id: '1', name: 'Fortnite' },
-  { id: '2', name: 'Warzone' },
-  { id: '3', name: 'Apex Legends' },
-  { id: '4', name: 'Valorant' },
-  { id: '5', name: 'Minecraft' },
-  { id: '6', name: 'Rocket League' },
-  {id: '7', name: 'HellDivers'},
-  {id: '8', name: 'Grounded'},
-  //We'll add some of the backend later
-];
+import { GAMES } from '../constants';
 
 
 export default function GameSelectScreen() {

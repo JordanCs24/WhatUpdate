@@ -1,84 +1,65 @@
-import { Text, StyleSheet, ScrollView, View, TouchableOpacity, } from 'react-native';
+import { Text, StyleSheet, ScrollView, View, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API_URL from '../api_url';
-
-
-const UPDATES = [
-  {
-    id: '1',
-    game: 'Fortnite',
-    image: '#1a6b9a',
-    updates: {
-      newContent: ['New weapon: Plasma Rifle', 'New map location: Crystal Cave'],
-      bugFixes: ['Fixed shotgun spread bug', 'Fixed crash on lobby screen'],
-      balanceChanges: ['SMG damage reduced by 10%', 'Shield potion cooldown increased'],
-    }
-  },
-  {
-    id: '2',
-    game: 'Warzone',
-    image: '#7a3b1e',
-    updates: {
-      newContent: ['New operator skin: Ghost Recon', 'New game mode: Resurgence'],
-      bugFixes: ['Fixed parachute clipping bug'],
-      balanceChanges: ['Sniper rifle bullet velocity increased'],
-    }
-  },
-  {
-    id: '3',
-    game: 'Apex Legends',
-    image: '#8b0000',
-    updates: {
-      newContent: ['New legend: Spectre', 'New care package weapon'],
-      bugFixes: ['Fixed Wraith hitbox issue', 'Fixed audio bug in Kings Canyon'],
-      balanceChanges: ['Caustic gas damage increased', 'Wingman headshot multiplier reduced'],
-    }
-  },
-];  
+import { GAMES } from '../constants';
 
 export default function FeedScreen() {
     const [expandedId, setExpandedId] = useState<string | null>(null);
-    const [userGames, setUserGames] = useState<string[]>([]);
+    const [updates, setUpdates] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     const fetchGames = async () => {
       console.log('fetching games...');
       console.log('API_URL: ', API_URL);
-    try {
-      const token = await AsyncStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/games`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      try {
+        const token = await AsyncStorage.getItem('token');
+        
+        // Step 1: Get user's saved games
+        const gamesResponse = await fetch(`${API_URL}/api/games`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
 
-      const data = await response.json();
+        const gamesData = await gamesResponse.json();
 
-      if (response.ok) {
-        setUserGames(data.games);
-      } else {
-        alert(data.message);
+        if (gamesResponse.ok) {
+          // Step 2: Fetch AI summaries for each game
+          const gamesList = GAMES.filter(g => gamesData.games.includes(g.id));
+          
+          const updatesResponse = await fetch(`${API_URL}/api/updates/fetch`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ games: gamesList }),
+          });
+
+          const updatesData = await updatesResponse.json();
+
+          if (updatesResponse.ok) {
+            setUpdates(updatesData.updates);
+          }
+        } else {
+          alert(gamesData.message);
+        }
+      } catch (err) {
+        alert('Could not connect to server!');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      alert('Could not connect to server!');
-    } finally {
-      setLoading(false);
-      // finally runs whether the request succeeded or failed. 
-      // We use it to stop the loading state either way.
-    }
-  };
+    };
 
   useEffect(() => {
     fetchGames();
   }, []);
 
-
-    const toggleCard = (id: string) => {
+  const toggleCard = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
-    
-    };
+  };
 
   if (loading) {
     return (
@@ -92,32 +73,32 @@ export default function FeedScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Your Updates</Text>
 
-      {UPDATES.filter(item => userGames.includes(item.id)).map(item =>(
-        <View key={item.id} style={styles.card}>
+      {updates.map(item => (
+        <View key={item._id} style={styles.card}>
           
           {/* Game banner */}
-          <TouchableOpacity onPress={() => toggleCard(item.id)}>
-            <View style={[styles.banner, { backgroundColor: item.image }]}>
-              <Text style={styles.gameName}>{item.game}</Text>
-              <Text style={styles.arrow}>{expandedId === item.id ? '▲' : '▼'}</Text>
+          <TouchableOpacity onPress={() => toggleCard(item._id)}>
+            <View style={[styles.banner, { backgroundColor: '#1a6b9a' }]}>
+              <Text style={styles.gameName}>{item.gameName}</Text>
+              <Text style={styles.arrow}>{expandedId === item._id ? '▲' : '▼'}</Text>
             </View>
           </TouchableOpacity>
 
           {/* Collapsible updates */}
-          {expandedId === item.id && (
+          {expandedId === item._id && (
             <View style={styles.updates}>
               <Text style={styles.categoryTitle}>🆕 New Content</Text>
-              {item.updates.newContent.map((update, index) => (
+              {item.summary.newContent.map((update: string, index: number) => (
                 <Text key={index} style={styles.updateItem}>• {update}</Text>
               ))}
 
               <Text style={styles.categoryTitle}>🐛 Bug Fixes</Text>
-              {item.updates.bugFixes.map((update, index) => (
+              {item.summary.bugFixes.map((update: string, index: number) => (
                 <Text key={index} style={styles.updateItem}>• {update}</Text>
               ))}
 
               <Text style={styles.categoryTitle}>⚖️ Balance Changes</Text>
-              {item.updates.balanceChanges.map((update, index) => (
+              {item.summary.balanceChanges.map((update: string, index: number) => (
                 <Text key={index} style={styles.updateItem}>• {update}</Text>
               ))}
             </View>
@@ -128,7 +109,6 @@ export default function FeedScreen() {
     </ScrollView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -184,4 +164,4 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     lineHeight: 20,
   },
-})
+});
