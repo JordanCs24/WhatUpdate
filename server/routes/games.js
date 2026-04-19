@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const verifyToken = require('../middleware/verifyToken');
 
 /**
  * @route   POST /api/games/save

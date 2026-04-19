@@ -63,6 +63,8 @@ export default function FeedScreen() {
       alert('Could not connect to server!');
     } finally {
       setLoading(false);
+      // finally runs whether the request succeeded or failed. 
+      // We use it to stop the loading state either way.
     }
   };
 
