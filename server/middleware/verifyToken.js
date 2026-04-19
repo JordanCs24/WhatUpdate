@@ -10,7 +10,9 @@ const jwt = require('jsonwebtoken');
  */
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
+  console.log('Auth header:', authHeader);
   const token = authHeader && authHeader.split(' ')[1];
+  console.log('Token:', token);
 
   if (!token) {
     return res.status(401).json({ message: 'No token, access denied!' });
@@ -18,9 +20,12 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log('Decoded token:', decoded);
+    console.log('Setting userId to:', decoded.id);
     req.userId = decoded.id;
     next();
   } catch (err) {
+    console.log('Token verification failed:', err.message);
     res.status(401).json({ message: 'Invalid token!' });
   }
 };

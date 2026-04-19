@@ -2,6 +2,7 @@ import { Text, StyleSheet, ScrollView, TouchableOpacity, View } from 'react-nati
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import API_URL from '../api_url';
 
 const GAMES = [
   { id: '1', name: 'Fortnite' },
@@ -36,7 +37,6 @@ export default function GameSelectScreen() {
     alert("Please select at least one game!");
     return;
   }
-  const API_URL = 'http://10.2.38.193:3000';
 
   // Send selected games to the backend
   // Token is included in the header to verify the user's identity

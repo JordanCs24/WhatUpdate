@@ -43,6 +43,8 @@ export default function FeedScreen() {
     const [loading, setLoading] = useState(true);
 
     const fetchGames = async () => {
+      console.log('fetching games...');
+      console.log('API_URL: ', API_URL);
     try {
       const token = await AsyncStorage.getItem('token');
       const response = await fetch(`${API_URL}/api/games`, {
@@ -75,12 +77,22 @@ export default function FeedScreen() {
 
     const toggleCard = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
+    
     };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Loading...</Text>
+      </View>
+    );
+  }
+    
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Your Updates</Text>
 
-      {UPDATES.map(item => (
+      {UPDATES.filter(item => userGames.includes(item.id)).map(item =>(
         <View key={item.id} style={styles.card}>
           
           {/* Game banner */}
@@ -116,6 +128,7 @@ export default function FeedScreen() {
     </ScrollView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -171,4 +184,4 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     lineHeight: 20,
   },
-});
+})

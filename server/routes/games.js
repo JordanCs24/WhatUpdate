@@ -15,9 +15,14 @@ const verifyToken = require('../middleware/verifyToken');
  * @errors  404 - User not found
  *          500 - Server error
  */
-router.post('/save', async (req, res) => {
+router.post('/save', verifyToken, async (req, res) => {
+    console.log('SAVE ROUTE HIT');
+    console.log('Headers:', req.headers);
   try {
-    const { userId, games } = req.body;
+    const { games } = req.body;
+    const userId = req.userId;
+    console.log('Save games - userId:', userId);
+    console.log('Save games - games:', games);
 
     const user = await User.findByIdAndUpdate(
         userId,
@@ -53,6 +58,8 @@ router.get('/', verifyToken, async (req, res) => {
     const userId = req.userId;
 
     const user = await User.findById(userId);
+    console.log('GET games - user:', user);
+    console.log('GET games - games:', user?.games);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found!' });

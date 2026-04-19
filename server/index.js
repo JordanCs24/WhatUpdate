@@ -14,6 +14,10 @@ app.get('/', (req, res) => {
   res.send('WhatUpdate API is running!');
 });
 
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/games', require('./routes/games'));
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
@@ -25,7 +29,3 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((err) => {
     console.log('MongoDB connection error:', err);
   });
-  
-// Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/games', require('./routes/games'));
