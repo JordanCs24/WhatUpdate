@@ -59,7 +59,10 @@ export default function FeedScreen() {
       setExpandedId(null);
     } else {
       setExpandedId(game.id);
-      fetchGameUpdate(game);
+      // Only fetch if we don't already have it in state
+      if (!updates[game.id]) {
+        fetchGameUpdate(game);
+      }
     }
   };
 

@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const { getJson } = require('serpapi');
-const { summarizeUpdate } = require('./gemini');
+const { summarizeUpdate } = require('./AI_API');
 
 /**
  * @desc    Uses SerpAPI to find the latest news URLs for a game
