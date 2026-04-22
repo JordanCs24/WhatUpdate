@@ -26,7 +26,6 @@ export default function LoginScreen() {
         if (response.ok) {
             await AsyncStorage.setItem('token', data.token);
             
-            alert(`Welcome back ${data.username}! Now let's get your favorite games updates`);
             router.push('/gameselect');
         } else {
             alert(data.message);
