@@ -19,13 +19,26 @@ const verifyToken = require('../middleware/verifyToken');
 router.post('/fetch', verifyToken, async (req, res) => {
   try {
     const { games } = req.body;
-
     const results = [];
+    const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 
     for (const game of games) {
+      // Check cache first for each game
+      const existingUpdate = await GameUpdates.findOne({ 
+        gameId: game.id,
+        fetchedAt: { $gte: twoDaysAgo }
+      });
+
+      if (existingUpdate) {
+        console.log(`Using cached update for ${game.name}`);
+        results.push(existingUpdate);
+        continue; // skip to next game
+      }
+
+      // No fresh cache found — fetch new data
+      console.log(`Fetching fresh update for ${game.name}`);
       const update = await fetchGameUpdate(game.id, game.name);
       if (update) {
-        // Save to MongoDB
         const saved = await GameUpdates.create(update);
         results.push(saved);
       }

@@ -1,76 +1,97 @@
-import { Text, StyleSheet, ScrollView, TouchableOpacity, View } from 'react-native';
+import { Text, StyleSheet, ScrollView, TouchableOpacity, View, TextInput } from 'react-native';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API_URL from '../api_url';
-import { GAMES } from '../constants';
-
 
 export default function GameSelectScreen() {
-  const [selectedGames, setSelectedGames] = useState<string[]>([]);
+  const [searchText, setSearchText] = useState('');
+  const [selectedGames, setSelectedGames] = useState<{id: string, name: string}[]>([]);
   const router = useRouter();
 
-/*
-  toggleGame is using the string paramater to find the 
-  games based on id then it checks the selectedGames if they actually exist
-*/
-  const toggleGame = (id: string) => {
-    if (selectedGames.includes(id)) {
-      setSelectedGames(selectedGames.filter(game => game !== id));
-    } else {
-      setSelectedGames([...selectedGames, id]);
+  const addGame = () => {
+    if (searchText.trim() === '') {
+      alert('Please enter a game name!');
+      return;
     }
+    if (selectedGames.find(g => g.name.toLowerCase() === searchText.toLowerCase())) {
+      alert('Game already added!');
+      return;
+    }
+    const newGame = { id: String(Date.now()), name: searchText.trim() };
+    setSelectedGames([...selectedGames, newGame]);
+    setSearchText('');
   };
+
+  const removeGame = (id: string) => {
+    setSelectedGames(selectedGames.filter(g => g.id !== id));
+  };
+
   const handleContinue = async () => {
-  if (selectedGames.length === 0) {
-    alert("Please select at least one game!");
-    return;
-  }
-
-  // Send selected games to the backend
-  // Token is included in the header to verify the user's identity
-  try{
-    const token = await AsyncStorage.getItem('token');
-    const response = await fetch(`${API_URL}/api/games/save`,{
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({ games: selectedGames }),
-
-    });
-    const data = await response.json();
-    if (response.ok) {
-        router.push('/feed');
-    } else {
-        alert(data.message);
+    if (selectedGames.length === 0) {
+      alert('Please add at least one game!');
+      return;
     }
-    
-  }
-   catch (err){ 
-    alert('Could not connect to server!');
+
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/games/save`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ games: selectedGames }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        router.push('/feed');
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert('Could not connect to server!');
     }
   };
-  
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Pick Your Games</Text>
-      <Text style={styles.subtitle}>Select the games you want updates for</Text>
-      
-        <View style={styles.grid}>
-      {GAMES.map(game => (
-          <TouchableOpacity
-            key={game.id}
-            style={[styles.card, selectedGames.includes(game.id) && styles.cardSelected]}
-            onPress={() => toggleGame(game.id)}
-          >
-            <Text style={styles.cardText}>{game.name}</Text>
-          </TouchableOpacity>
-      ))}
-  </View>
+      <Text style={styles.subtitle}>Search and add any game you want updates for</Text>
+
+      {/* Search input */}
+      <View style={styles.searchRow}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search for a game..."
+          placeholderTextColor="#5c6874"
+          value={searchText}
+          onChangeText={setSearchText}
+        />
+        <TouchableOpacity style={styles.addButton} onPress={addGame}>
+          <Text style={styles.addButtonText}>ADD</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Selected games list */}
+      {selectedGames.length > 0 && (
+        <View style={styles.gamesList}>
+          <Text style={styles.listTitle}>YOUR GAMES</Text>
+          {selectedGames.map(game => (
+            <View key={game.id} style={styles.gameItem}>
+              <Text style={styles.gameName}>{game.name}</Text>
+              <TouchableOpacity onPress={() => removeGame(game.id)}>
+                <Text style={styles.removeButton}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
+
       <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-        <Text style={styles.buttonText}>Continue</Text>
+        <Text style={styles.buttonText}>CONTINUE</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -90,42 +111,73 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 32,
+    marginBottom: 8,
   },
   subtitle: {
     color: '#c0d5e9',
     fontSize: 14,
     marginBottom: 32,
-  },grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
   },
-  card: {
-    backgroundColor: '#0D1117',
+  searchRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 24,
+  },
+  searchInput: {
+    flex: 1,
+    backgroundColor: '#000000',
     borderWidth: 1,
     borderColor: '#ffffff',
     borderRadius: 8,
-    padding: 16,
-    width: '47%',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    color: '#ffffff',
+    fontSize: 15,
+  },
+  addButton: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    paddingHorizontal: 20,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  cardSelected: {
-    backgroundColor: '#2b8a6e',
-    borderColor: '#2b8a6e',
+  addButtonText: {
+    color: '#2b5a54',
+    fontWeight: 'bold',
+    fontSize: 13,
+    letterSpacing: 2,
   },
-  cardText: {
+  gamesList: {
+    marginBottom: 24,
+  },
+  listTitle: {
+    color: '#556677',
+    fontSize: 11,
+    letterSpacing: 3,
+    marginBottom: 12,
+  },
+  gameItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#0D1117',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 8,
+  },
+  gameName: {
     color: '#ffffff',
-    fontSize: 14,
+    fontSize: 15,
+  },
+  removeButton: {
+    color: '#FF4455',
+    fontSize: 16,
     fontWeight: 'bold',
   },
   continueButton: {
     backgroundColor: '#ffffff',
     borderRadius: 8,
-    borderWidth: 2,
-    width: 250,
-    height: 80,
-    justifyContent: 'center',  // ← centers text vertically
+    paddingVertical: 16,
     alignItems: 'center',
     marginTop: 8,
   },

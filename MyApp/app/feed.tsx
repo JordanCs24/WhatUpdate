@@ -1,106 +1,120 @@
-import { Text, StyleSheet, ScrollView, View, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, ScrollView, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API_URL from '../api_url';
-import { GAMES } from '../constants';
 
 export default function FeedScreen() {
-    const [expandedId, setExpandedId] = useState<string | null>(null);
-    const [updates, setUpdates] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [userGames, setUserGames] = useState<{id: string, name: string}[]>([]);
+  const [updates, setUpdates] = useState<{[key: string]: any}>({});
+  const [loadingGames, setLoadingGames] = useState(true);
+  const [loadingUpdate, setLoadingUpdate] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
-    const fetchGames = async () => {
-      console.log('fetching games...');
-      console.log('API_URL: ', API_URL);
-      try {
-        const token = await AsyncStorage.getItem('token');
-        
-        // Step 1: Get user's saved games
-        const gamesResponse = await fetch(`${API_URL}/api/games`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-
-        const gamesData = await gamesResponse.json();
-
-        if (gamesResponse.ok) {
-          // Step 2: Fetch AI summaries for each game
-          const gamesList = GAMES.filter(g => gamesData.games.includes(g.id));
-          
-          const updatesResponse = await fetch(`${API_URL}/api/updates/fetch`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({ games: gamesList }),
-          });
-
-          const updatesData = await updatesResponse.json();
-
-          if (updatesResponse.ok) {
-            setUpdates(updatesData.updates);
-          }
-        } else {
-          alert(gamesData.message);
-        }
-      } catch (err) {
-        alert('Could not connect to server!');
-      } finally {
-        setLoading(false);
+  const fetchUserGames = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/games`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setUserGames(data.games);
       }
-    };
-
-  useEffect(() => {
-    fetchGames();
-  }, []);
-
-  const toggleCard = (id: string) => {
-    setExpandedId(expandedId === id ? null : id);
+    } catch (err) {
+      alert('Could not connect to server!');
+    } finally {
+      setLoadingGames(false);
+    }
   };
 
-  if (loading) {
+  const fetchGameUpdate = async (game: {id: string, name: string}) => {
+    // If already loaded don't fetch again
+    if (updates[game.id]) return;
+
+    setLoadingUpdate(game.id);
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/updates/fetch`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ games: [game] }),
+      });
+      const data = await response.json();
+      if (response.ok && data.updates.length > 0) {
+        setUpdates(prev => ({ ...prev, [game.id]: data.updates[0] }));
+      }
+    } catch (err) {
+      alert('Could not fetch update!');
+    } finally {
+      setLoadingUpdate(null);
+    }
+  };
+
+  const toggleCard = (game: {id: string, name: string}) => {
+    if (expandedId === game.id) {
+      setExpandedId(null);
+    } else {
+      setExpandedId(game.id);
+      fetchGameUpdate(game);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserGames();
+  }, []);
+
+  if (loadingGames) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Loading...</Text>
       </View>
     );
   }
-    
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Your Updates</Text>
 
-      {updates.map(item => (
-        <View key={item._id} style={styles.card}>
-          
+      {userGames.map(game => (
+        <View key={game.id} style={styles.card}>
+
           {/* Game banner */}
-          <TouchableOpacity onPress={() => toggleCard(item._id)}>
+          <TouchableOpacity onPress={() => toggleCard(game)}>
             <View style={[styles.banner, { backgroundColor: '#1a6b9a' }]}>
-              <Text style={styles.gameName}>{item.gameName}</Text>
-              <Text style={styles.arrow}>{expandedId === item._id ? '▲' : '▼'}</Text>
+              <Text style={styles.gameName}>{game.name}</Text>
+              <Text style={styles.arrow}>{expandedId === game.id ? '▲' : '▼'}</Text>
             </View>
           </TouchableOpacity>
 
           {/* Collapsible updates */}
-          {expandedId === item._id && (
+          {expandedId === game.id && (
             <View style={styles.updates}>
-              <Text style={styles.categoryTitle}>🆕 New Content</Text>
-              {item.summary.newContent.map((update: string, index: number) => (
-                <Text key={index} style={styles.updateItem}>• {update}</Text>
-              ))}
+              {loadingUpdate === game.id ? (
+                <ActivityIndicator color="#00C878" />
+              ) : updates[game.id] ? (
+                <>
+                  <Text style={styles.categoryTitle}>🆕 New Content</Text>
+                  {updates[game.id].summary.newContent.map((update: string, index: number) => (
+                    <Text key={index} style={styles.updateItem}>• {update}</Text>
+                  ))}
 
-              <Text style={styles.categoryTitle}>🐛 Bug Fixes</Text>
-              {item.summary.bugFixes.map((update: string, index: number) => (
-                <Text key={index} style={styles.updateItem}>• {update}</Text>
-              ))}
+                  <Text style={styles.categoryTitle}>🐛 Bug Fixes</Text>
+                  {updates[game.id].summary.bugFixes.map((update: string, index: number) => (
+                    <Text key={index} style={styles.updateItem}>• {update}</Text>
+                  ))}
 
-              <Text style={styles.categoryTitle}>⚖️ Balance Changes</Text>
-              {item.summary.balanceChanges.map((update: string, index: number) => (
-                <Text key={index} style={styles.updateItem}>• {update}</Text>
-              ))}
+                  <Text style={styles.categoryTitle}>⚖️ Balance Changes</Text>
+                  {updates[game.id].summary.balanceChanges.map((update: string, index: number) => (
+                    <Text key={index} style={styles.updateItem}>• {update}</Text>
+                  ))}
+                </>
+              ) : (
+                <Text style={styles.updateItem}>No updates found</Text>
+              )}
             </View>
           )}
 
