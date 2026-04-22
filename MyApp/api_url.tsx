@@ -1,3 +1,3 @@
-const API_URL = 'http://10.2.38.193:3000';
+const API_URL = 'http://whatupdate-server-production.up.railway.app';
 
 export default API_URL;
