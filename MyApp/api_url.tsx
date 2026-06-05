@@ -1,3 +1,3 @@
-const API_URL = 'http://whatupdate-server-production.up.railway.app';
+const API_URL = 'https://whatupdate.onrender.com';
 
 export default API_URL;
